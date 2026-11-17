@@ -1,132 +1,361 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#10191c" />
-    <title>AERION — шахматы с размахом</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="noise" aria-hidden="true"></div>
-    <div class="skyline" aria-hidden="true">
-      <svg class="pegasus-outline p-one" viewBox="0 0 260 210" fill="none"><path d="M206 45c-31-21-58-19-86-1-23 15-42 40-40 74 1 30 30 54 62 48 23-4 43-28 45-49 17 4 36-1 46-16-15 2-28-1-38-10 24-1 44-16 54-36-16 6-30 5-43-10Z"/><path d="M116 97 54 26l36 91-69-22 62 53"/><path d="M96 162c-10 18-18 29-38 37m93-37c10 18 24 28 45 35"/></svg>
-      <svg class="pegasus-outline p-two" viewBox="0 0 260 210" fill="none"><path d="M206 45c-31-21-58-19-86-1-23 15-42 40-40 74 1 30 30 54 62 48 23-4 43-28 45-49 17 4 36-1 46-16-15 2-28-1-38-10 24-1 44-16 54-36-16 6-30 5-43-10Z"/><path d="M116 97 54 26l36 91-69-22 62 53"/><path d="M96 162c-10 18-18 29-38 37m93-37c10 18 24 28 45 35"/></svg>
-    </div>
-
-    <header class="topbar">
-      <button class="brand" data-screen="lobby" aria-label="На главную">
-        <span class="brand-mark">A</span><span>AERION</span>
-      </button>
-      <nav aria-label="Основная навигация">
-        <button class="nav-link active" data-screen="lobby">Лобби</button>
-        <button class="nav-link" data-screen="play">Играть</button>
-        <button class="nav-link" data-screen="analysis">Анализ</button>
-      </nav>
-      <div class="top-actions">
-        <button class="online-pill" data-screen="lobby"><i></i><span id="onlineCount">0</span> онлайн</button>
-        <button class="profile-button" id="profileButton"><span class="avatar" id="avatarInitial">A</span><span id="nickLabel">Арсен</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg></button>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pegasus · Шахматы с пегасами</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: #0b0d10; color: #eef2f6; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+    .bg-figures { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+    .bg-figures span { position: absolute; font-size: 8vw; color: rgba(255,255,255,0.025); font-weight: 300; user-select: none; animation: floatFigure 24s infinite alternate ease-in-out; white-space: nowrap; }
+    .bg-figures span:nth-child(1) { top: 5%; left: 2%; animation-duration: 20s; }
+    .bg-figures span:nth-child(2) { top: 70%; left: 85%; animation-duration: 28s; animation-delay: -3s; }
+    .bg-figures span:nth-child(3) { top: 40%; left: 15%; animation-duration: 32s; animation-delay: -7s; }
+    .bg-figures span:nth-child(4) { top: 80%; left: 10%; animation-duration: 26s; animation-delay: -12s; }
+    .bg-figures span:nth-child(5) { top: 10%; left: 75%; animation-duration: 22s; animation-delay: -5s; }
+    .bg-figures span:nth-child(6) { top: 50%; left: 90%; animation-duration: 30s; animation-delay: -9s; }
+    .bg-figures span:nth-child(7) { top: 25%; left: 45%; animation-duration: 35s; animation-delay: -15s; }
+    @keyframes floatFigure { 0% { transform: translate(0,0) rotate(0deg) scale(1); } 100% { transform: translate(3vw,-4vh) rotate(8deg) scale(1.05); } }
+    .app { position: relative; z-index: 10; max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem 3rem; width: 100%; flex: 1; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .logo h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: -0.02em; background: linear-gradient(135deg,#fff 0%,#b0c4de 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .logo h1 i { font-size: 2rem; color: #b0c4de; -webkit-text-fill-color: #b0c4de; }
+    .slogan { font-size: 0.95rem; color: #8b9eb0; font-weight: 300; letter-spacing: 0.3px; margin-top: 0.2rem; border-left: 2px solid #3a4a5a; padding-left: 1rem; }
+    .slogan strong { color: #cbd5e1; font-weight: 500; }
+    .online-panel { display: flex; align-items: center; gap: 1.5rem; background: rgba(18,24,30,0.8); backdrop-filter: blur(12px); padding: 0.6rem 1.4rem; border-radius: 60px; border: 1px solid rgba(255,255,255,0.06); }
+    .online-count { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: #b0c4de; }
+    .online-count i { font-size: 0.8rem; color: #4ade80; }
+    .online-count span { font-weight: 600; color: #eef2f6; margin-left: 0.1rem; }
+    .nickname { display: flex; align-items: center; gap: 0.5rem; background: #1e2a36; padding: 0.4rem 1rem 0.4rem 0.8rem; border-radius: 40px; border: 1px solid #2e3e4e; transition: 0.2s; }
+    .nickname i { color: #7f8fa0; font-size: 0.9rem; }
+    .nickname input { background: transparent; border: none; color: #eef2f6; font-size: 0.95rem; font-weight: 400; outline: none; width: 110px; padding: 0.2rem 0; }
+    .nickname input::placeholder { color: #5a6b7a; font-weight: 300; }
+    .nickname button { background: #2e3e4e; border: none; color: #b0c4de; padding: 0.3rem 0.8rem; border-radius: 30px; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: 0.2s; }
+    .nickname button:hover { background: #3e5368; color: white; }
+    .main-grid { display: grid; grid-template-columns: 1fr 300px; gap: 2rem; align-items: start; }
+    @media (max-width: 950px) { .main-grid { grid-template-columns: 1fr; } }
+    .board-section { display: flex; flex-direction: column; gap: 1.2rem; }
+    .mode-bar { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; background: rgba(18,24,30,0.7); backdrop-filter: blur(8px); padding: 0.7rem 1rem; border-radius: 40px; border: 1px solid rgba(255,255,255,0.05); }
+    .mode-btn { background: transparent; border: 1px solid #2e3e4e; color: #b0c4de; padding: 0.4rem 1rem; border-radius: 30px; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.4rem; }
+    .mode-btn i { font-size: 0.75rem; }
+    .mode-btn.active { background: #2e4a5e; border-color: #4a7a9a; color: white; box-shadow: 0 0 12px rgba(74,122,154,0.3); }
+    .mode-btn:hover { border-color: #4a7a9a; color: white; }
+    .time-group { display: flex; gap: 0.4rem; margin-left: auto; flex-wrap: wrap; }
+    .time-btn { background: transparent; border: 1px solid #2e3e4e; color: #8b9eb0; padding: 0.3rem 0.8rem; border-radius: 30px; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    .time-btn.active { background: #1e3a4a; border-color: #4a7a9a; color: white; }
+    .time-btn:hover { border-color: #4a7a9a; color: white; }
+    .move-history { background: rgba(18,24,30,0.6); backdrop-filter: blur(8px); padding: 0.5rem 1rem; border-radius: 30px; font-size: 0.8rem; color: #8b9eb0; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; border: 1px solid rgba(255,255,255,0.03); min-height: 2.5rem; }
+    .move-history .move-item { background: #1e2a36; padding: 0.2rem 0.6rem; border-radius: 20px; color: #cbd5e1; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+    .move-history .move-item.white { border-left: 2px solid #eef2f6; }
+    .move-history .move-item.black { border-left: 2px solid #5a6b7a; }
+    .board-wrapper { background: #141a20; padding: 1.2rem; border-radius: 32px; border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6); transition: box-shadow 0.3s; }
+    .board-wrapper:hover { box-shadow: 0 24px 48px -8px rgba(0,0,0,0.7); }
+    .chessboard { display: grid; grid-template-columns: repeat(8,1fr); aspect-ratio: 1/1; width: 100%; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: transform 0.3s cubic-bezier(0.2,0.9,0.3,1); }
+    .chessboard:hover { transform: scale(1.005); }
+    .square { display: flex; align-items: center; justify-content: center; font-size: 2.2vw; font-weight: 400; transition: background 0.2s, transform 0.2s; cursor: pointer; user-select: none; aspect-ratio: 1/1; position: relative; }
+    .square.light { background: #d9e2ec; color: #1e2a36; }
+    .square.dark { background: #7a8fa0; color: #eef2f6; }
+    .square:hover { transform: scale(0.97); filter: brightness(1.1); z-index: 2; }
+    .piece { transition: all 0.25s ease; display: inline-block; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2)); }
+    .piece.pegasus { font-size: 2.4vw; background: linear-gradient(135deg,#f0e6d2,#b8a99a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0 0 8px rgba(240,230,210,0.3); transform: rotate(-3deg); }
+    .piece.king { color: #f5e6b0; } .piece.queen { color: #e8c9a0; } .piece.rook { color: #c0b0a0; }
+    .piece.bishop { color: #b8c8d8; } .piece.knight { color: #c8b8a8; } .piece.pawn { color: #d8d0c0; }
+    .square.dark .piece.king { color: #b0a080; } .square.dark .piece.queen { color: #c0a880; }
+    .square.dark .piece.rook { color: #908070; } .square.dark .piece.bishop { color: #8898a8; }
+    .square.dark .piece.knight { color: #a89888; } .square.dark .piece.pawn { color: #b0a898; }
+    .timers { display: flex; justify-content: space-between; gap: 1rem; padding: 0 0.2rem; }
+    .timer { background: #141a20; border: 1px solid #2e3e4e; padding: 0.6rem 1.2rem; border-radius: 30px; font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; font-weight: 500; color: #eef2f6; display: flex; align-items: center; gap: 0.5rem; transition: 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .timer i { font-size: 0.9rem; color: #7f8fa0; }
+    .timer.active { border-color: #4a7a9a; box-shadow: 0 0 20px rgba(74,122,154,0.2); background: #1a2a36; }
+    .timer span { min-width: 70px; text-align: center; }
+    .action-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 0.5rem; }
+    .btn { background: #1e2a36; border: 1px solid #2e3e4e; color: #cbd5e1; padding: 0.7rem 1.6rem; border-radius: 40px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.6rem; flex: 1 1 auto; justify-content: center; letter-spacing: 0.3px; }
+    .btn i { font-size: 0.9rem; }
+    .btn-primary { background: #2e4a5e; border-color: #4a7a9a; color: white; box-shadow: 0 4px 16px rgba(74,122,154,0.25); }
+    .btn-primary:hover { background: #3a5a72; border-color: #5a8aaa; transform: translateY(-1px); }
+    .btn-secondary:hover { background: #2a3a4a; border-color: #4a6a7a; color: white; transform: translateY(-1px); }
+    .btn-danger { border-color: #6a3a3a; color: #e0a0a0; }
+    .btn-danger:hover { background: #3a1e1e; border-color: #8a4a4a; color: #ffc0c0; }
+    .sidebar { background: rgba(18,24,30,0.7); backdrop-filter: blur(12px); border-radius: 32px; padding: 1.5rem 1.2rem; border: 1px solid rgba(255,255,255,0.04); display: flex; flex-direction: column; gap: 1.5rem; position: sticky; top: 1.5rem; }
+    .sidebar-section h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #7f8fa0; font-weight: 500; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; }
+    .sidebar-section h3 i { font-size: 0.75rem; }
+    .player-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .player-item { display: flex; align-items: center; gap: 0.7rem; padding: 0.5rem 0.8rem; background: #1a222a; border-radius: 20px; border: 1px solid #2a3a4a; transition: 0.2s; animation: fadeIn 0.4s ease; }
+    .player-item:hover { background: #1e2a36; border-color: #3a4a5a; }
+    .player-avatar { width: 32px; height: 32px; border-radius: 50%; background: #2e4a5e; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #b0c4de; }
+    .player-info { flex: 1; }
+    .player-name { font-size: 0.9rem; font-weight: 500; color: #eef2f6; }
+    .player-elo { font-size: 0.7rem; color: #7f8fa0; display: flex; align-items: center; gap: 0.3rem; }
+    .player-elo i { color: #f0c060; font-size: 0.6rem; }
+    .challenge-btn { background: transparent; border: 1px solid #3a5a72; color: #8ab0c8; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.65rem; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    .challenge-btn:hover { background: #2e4a5e; color: white; border-color: #4a7a9a; }
+    .mod-list { display: flex; flex-direction: column; gap: 0.4rem; }
+    .mod-item { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.8rem; background: #1a222a; border-radius: 16px; border: 1px solid #2a3a4a; transition: 0.2s; cursor: pointer; }
+    .mod-item:hover { border-color: #4a7a9a; }
+    .mod-item.active { background: #1e2a36; border-color: #4a7a9a; }
+    .mod-label { font-size: 0.8rem; font-weight: 400; color: #cbd5e1; display: flex; align-items: center; gap: 0.5rem; }
+    .mod-label i { font-size: 0.7rem; color: #7f8fa0; }
+    .mod-badge { font-size: 0.6rem; background: #2e4a5e; color: #b0d0e8; padding: 0.15rem 0.5rem; border-radius: 20px; letter-spacing: 0.3px; }
+    .analysis-panel { background: #121a20; border-radius: 20px; padding: 1rem; border: 1px solid #2a3a4a; display: flex; flex-direction: column; gap: 0.6rem; }
+    .analysis-panel .analysis-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #7f8fa0; }
+    .analysis-panel .analysis-header i { color: #f0c060; }
+    .analysis-move { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.6rem; background: #1a222a; border-radius: 12px; font-size: 0.75rem; }
+    .analysis-move .badge { padding: 0.15rem 0.5rem; border-radius: 20px; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.2px; }
+    .badge.brilliant { background: #2e5a4e; color: #8ae0c0; }
+    .badge.mistake { background: #5a3a3a; color: #e0a0a0; }
+    .badge.best { background: #2e3a5e; color: #a0c0e0; }
+    .analysis-move .move-text { font-family: 'JetBrains Mono', monospace; color: #cbd5e1; }
+    .analysis-move .move-desc { color: #7f8fa0; font-size: 0.65rem; margin-left: auto; }
+    .waiting-text { font-size: 0.7rem; color: #5a6b7a; text-align: center; padding: 1rem 0; font-style: italic; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.4s ease; }
+    ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #0b0d10; }
+    ::-webkit-scrollbar-thumb { background: #2e3e4e; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4a5a6a; }
+    @media (max-width: 700px) {
+      .app { padding: 1rem; } .header { flex-direction: column; align-items: flex-start; }
+      .online-panel { width: 100%; justify-content: space-between; }
+      .logo h1 { font-size: 1.7rem; } .square { font-size: 5vw; } .piece.pegasus { font-size: 5.5vw; }
+      .timer { font-size: 1rem; padding: 0.4rem 0.8rem; } .timer span { min-width: 50px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-figures">
+    <span>♞</span><span>♝</span><span>♛</span><span>♜</span><span>♟</span><span>♞</span><span>♝</span>
+  </div>
+  <div class="app">
+    <header class="header">
+      <div class="logo">
+        <h1><i class="fas fa-chess-knight"></i> Pegasus</h1>
+        <div class="slogan"><strong>Где кони обретают крылья</strong> — шахматы без границ</div>
+      </div>
+      <div class="online-panel">
+        <div class="online-count"><i class="fas fa-circle"></i> <span id="onlineCount">42</span> онлайн</div>
+        <div class="nickname">
+          <i class="fas fa-user"></i>
+          <input type="text" id="nicknameInput" placeholder="Ваш ник" value="Игрок">
+          <button id="setNickBtn">OK</button>
+        </div>
       </div>
     </header>
-
-    <main>
-      <section id="lobbyScreen" class="screen active">
-        <section class="hero">
-          <p class="eyebrow">СОЗДАНО ДЛЯ ТЕХ, КТО ВИДИТ ДАЛЬШЕ</p>
-          <h1>Шахматы,<br /><em>которые взлетают.</em></h1>
-          <p class="hero-copy">В каждой позиции есть больше, чем один путь. Найди свой — и оставь след в небе.</p>
-          <div class="hero-actions">
-            <button class="button primary large" id="quickPlayButton"><span class="button-icon">↗</span> Найти соперника</button>
-            <button class="button ghost large" id="computerButton"><span class="button-icon">♙</span> Играть с компьютером</button>
+    <div class="main-grid">
+      <div class="board-section">
+        <div class="mode-bar">
+          <button class="mode-btn active" data-mode="classic"><i class="fas fa-chess"></i> Классика</button>
+          <button class="mode-btn" data-mode="chess960"><i class="fas fa-random"></i> Шахматы 960</button>
+          <button class="mode-btn" data-mode="pegasus"><i class="fas fa-horse-head"></i> Пегасы</button>
+          <div class="time-group">
+            <button class="time-btn active" data-time="10">10м</button>
+            <button class="time-btn" data-time="15+10">15+10</button>
+            <button class="time-btn" data-time="30">30м</button>
+            <button class="time-btn" data-time="60">60м</button>
+            <button class="time-btn" data-time="1">Пуля 1м</button>
+            <button class="time-btn" data-time="3">Блиц 3м</button>
+            <button class="time-btn" data-time="5">Блиц 5м</button>
           </div>
-          <div class="hero-stats">
-            <span><b id="heroOnline">0</b> игроков в игре</span><span class="dot-divider"></span><span>Рейтинговые партии</span>
+        </div>
+        <div class="move-history" id="moveHistory">
+          <span style="color:#5a6b7a;font-size:0.7rem;">Ходы партии:</span>
+        </div>
+        <div class="board-wrapper">
+          <div class="chessboard" id="chessboard"></div>
+        </div>
+        <div class="timers">
+          <div class="timer" id="timerWhite"><i class="fas fa-crown"></i><span>10:00</span></div>
+          <div class="timer" id="timerBlack"><i class="fas fa-crown"></i><span>10:00</span></div>
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-primary" id="startGameBtn"><i class="fas fa-play"></i> Начать партию</button>
+          <button class="btn btn-secondary" id="playComputerBtn"><i class="fas fa-robot"></i> С компьютером</button>
+          <button class="btn btn-danger" id="resignBtn"><i class="fas fa-flag"></i> Сдаться</button>
+        </div>
+      </div>
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <h3><i class="fas fa-users"></i> Игроки онлайн</h3>
+          <div class="player-list" id="playerList"></div>
+        </div>
+        <div class="sidebar-section">
+          <h3><i class="fas fa-sliders-h"></i> Моды</h3>
+          <div class="mod-list" id="modList">
+            <div class="mod-item active" data-mod="classic"><span class="mod-label"><i class="fas fa-chess"></i> Классические шахматы</span><span class="mod-badge">Стандарт</span></div>
+            <div class="mod-item" data-mod="chess960"><span class="mod-label"><i class="fas fa-random"></i> Шахматы 960</span><span class="mod-badge">Фишер</span></div>
+            <div class="mod-item" data-mod="pegasus"><span class="mod-label"><i class="fas fa-horse-head"></i> Пегасы вместо коней</span><span class="mod-badge">6 очков</span></div>
           </div>
-        </section>
-
-        <section class="lobby-grid" aria-label="Игровое лобби">
-          <article class="panel queue-panel">
-            <div class="panel-heading"><div><p class="section-kicker">01 / ПОДБОР</p><h2>Начать партию</h2></div><span class="queue-mark">⌁</span></div>
-            <div class="segmented" role="tablist" aria-label="Тип партии">
-              <button class="segment active" data-game-mode="standard">Классика</button>
-              <button class="segment" data-game-mode="pegasus">Пегас</button>
-              <button class="segment" data-game-mode="chess960">960</button>
-            </div>
-            <p class="mode-description" id="modeDescription">Классические шахматы — чистая стратегия без лишнего шума.</p>
-            <div class="time-block"><div class="label-row"><span>КОНТРОЛЬ ВРЕМЕНИ</span><span id="timeDescription">Рапид</span></div><div id="timeControls" class="time-controls"></div></div>
-            <div class="queue-actions"><button class="button primary" id="startRated">Играть рейтинг</button><button class="icon-button" id="randomizeSide" title="Случайный цвет">⇄</button></div>
-          </article>
-
-          <article class="panel variation-panel">
-            <div class="panel-heading"><div><p class="section-kicker">02 / ВАРИАЦИИ</p><h2>Пегас</h2></div><span class="piece-value">6</span></div>
-            <div class="pegasus-card">
-              <div class="mini-pegasus">♞<span>⌁</span></div>
-              <div><p>Конь + слон</p><small>Пегас ходит как конь или по диагонали. Выберите этот режим в подборе.</small></div>
-            </div>
-            <div class="variant-rule"><span>♞</span><span class="rule-plus">+</span><span>♝</span><span class="rule-equals">=</span><span class="pegasus-symbol">♞</span></div>
-            <button class="text-button" id="selectPegasus">Выбрать режим Пегас <span>→</span></button>
-          </article>
-
-          <article class="panel people-panel">
-            <div class="panel-heading"><div><p class="section-kicker">03 / СЕЙЧАС В СЕТИ</p><h2>Игроки</h2></div><button class="text-button compact" id="refreshPeople">Обновить</button></div>
-            <div id="peopleList" class="people-list"><p class="empty-people">Подключаем живых игроков…</p></div>
-            <button class="button outline full" id="openChallenge">Бросить вызов</button>
-          </article>
-        </section>
-
-        <section class="how-it-works">
-          <p>Выберите формат <span>·</span> Установите время <span>·</span> Играйте <span>·</span> Разберите партию</p>
-        </section>
-      </section>
-
-      <section id="playScreen" class="screen play-screen">
-        <div class="game-layout">
-          <aside class="game-sidebar left-sidebar">
-            <button class="sidebar-back" data-screen="lobby">← Вернуться в лобби</button>
-            <div class="match-meta"><p class="section-kicker">РЕЙТИНГОВАЯ ПАРТИЯ</p><h2 id="matchTitle">Классика</h2><p id="matchSubline">Найдите соперника, чтобы начать</p></div>
-            <div class="side-rule"></div>
-            <p class="side-label">ПАРТИЯ</p>
-            <div class="game-details"><div><span>Формат</span><b id="detailMode">Классика</b></div><div><span>Время</span><b id="detailTime">10 мин</b></div><div><span>Ставка</span><b id="detailRating">Рейтинг</b></div></div>
-            <button class="resign-button" id="resignButton">Сдаться</button>
-          </aside>
-
-          <section class="board-stage">
-            <div class="move-ribbon" aria-label="Последние ходы"><div class="ribbon-title"><span class="pulse"></span><span id="gameStatus">Ожидание соперника</span></div><div class="move-track" id="moveTrack"><span class="move-empty">Первые ходы появятся здесь</span></div></div>
-            <div class="player-strip opponent" id="opponentStrip"><span class="avatar opponent-avatar" id="opponentInitial">?</span><div><b id="opponentName">Соперник</b><span id="opponentRating">Подбираем игрока</span></div><div class="clock" id="blackClock">10:00</div></div>
-            <div class="board-frame"><div class="coordinates files" aria-hidden="true"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div><div class="coordinates ranks" aria-hidden="true"><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span></div><div id="board" class="board" aria-label="Шахматная доска"></div></div>
-            <div class="player-strip self"><span class="avatar" id="playerInitial">A</span><div><b id="playerName">Арсен</b><span id="playerRating">Рейтинг 1200</span></div><div class="clock active" id="whiteClock">10:00</div></div>
-          </section>
-
-          <aside class="game-sidebar right-sidebar">
-            <div class="panel mini-panel"><p class="section-kicker">ХОДЫ ПАРТИИ</p><div class="notation-head"><span>№</span><span>Белые</span><span>Чёрные</span></div><div id="moveList" class="move-list"><p class="empty-moves">Доска ждёт первого хода.</p></div></div>
-            <div class="panel mini-panel insight-card"><p class="section-kicker">ПОЛЕ ЗРЕНИЯ</p><p id="turnInsight">Партия начнётся после выбора соперника.</p><div class="mini-bars"><i></i><i></i><i></i><i></i><i></i></div></div>
-            <button class="button ghost full" id="offerDraw">Предложить ничью</button>
-          </aside>
         </div>
-      </section>
-
-      <section id="analysisScreen" class="screen analysis-screen">
-        <div class="analysis-hero"><p class="eyebrow">ПОСЛЕ ПАРТИИ</p><h1>Найди момент,<br /><em>когда всё изменилось.</em></h1><p>Разбор доступен только после завершения партии. Движок изучает позицию, а ты видишь идеи за ходами.</p></div>
-        <div class="analysis-grid">
-          <article class="panel analysis-status" id="analysisLocked"><span class="lock-icon">⌁</span><div><p class="section-kicker">STOCKFISH / АНАЛИЗ</p><h2>Закончите партию</h2><p>Чтобы защитить честную игру, подсказки и оценки открываются только после результата.</p></div></article>
-          <article class="panel analysis-results hidden" id="analysisResults"><div class="panel-heading"><div><p class="section-kicker">STOCKFISH / РАЗБОР</p><h2>Ключевые ходы</h2></div><span id="analysisDepth" class="engine-badge">ДВИЖОК</span></div><div id="analysisProgress" class="analysis-progress hidden"><span></span></div><div id="analysisList" class="analysis-list"></div></article>
-          <article class="panel report-card"><p class="section-kicker">ТВОЯ ИГРА</p><div class="report-score" id="accuracyScore">—<small>точность</small></div><div class="report-row"><span>Рейтинг</span><b id="ratingChange">1200</b></div><div class="report-row"><span>Лучший ход</span><b id="bestMoveDisplay">—</b></div></article>
+        <div class="sidebar-section">
+          <h3><i class="fas fa-chart-line"></i> Анализ партии</h3>
+          <div class="analysis-panel" id="analysisPanel">
+            <div class="analysis-header"><span><i class="fas fa-microchip"></i> Stockfish</span><span>после партии</span></div>
+            <div class="waiting-text" id="analysisWaiting">Завершите партию для анализа</div>
+            <div id="analysisMoves" style="display:none;flex-direction:column;gap:0.4rem;"></div>
+          </div>
         </div>
-      </section>
-    </main>
-
-    <div class="modal-layer" id="modalLayer" aria-hidden="true">
-      <section class="modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
-        <button class="modal-close" data-close-modal>×</button><p class="section-kicker">ПРОФИЛЬ</p><h2 id="profileTitle">Как тебя зовут?</h2><p>Этот ник увидят соперники в лобби и во время партии.</p><label class="input-label" for="nickInput">НИКНЕЙМ</label><input id="nickInput" maxlength="18" placeholder="Например, AerionKnight" /><button class="button primary full" id="saveProfile">Сохранить</button>
-      </section>
-      <section class="modal hidden" id="challengeModal" role="dialog" aria-modal="true" aria-labelledby="challengeTitle">
-        <button class="modal-close" data-close-modal>×</button><p class="section-kicker">ПРЯМОЙ ВЫЗОВ</p><h2 id="challengeTitle">Выберите игрока</h2><p id="challengeCopy">Игроки появятся здесь, когда подключатся к вашему серверу.</p><div id="challengeList" class="challenge-list"></div><button class="button ghost full" data-close-modal>Отмена</button>
-      </section>
+        <div class="sidebar-section">
+          <h3><i class="fas fa-trophy"></i> Ваш рейтинг</h3>
+          <div style="display:flex;align-items:center;gap:0.8rem;background:#1a222a;padding:0.8rem 1rem;border-radius:20px;border:1px solid #2a3a4a;">
+            <i class="fas fa-star" style="color:#f0c060;font-size:1.2rem;"></i>
+            <div><div style="font-size:1.1rem;font-weight:600;color:#eef2f6;">1480</div><div style="font-size:0.65rem;color:#7f8fa0;">Эло · 124 партии</div></div>
+          </div>
+        </div>
+      </aside>
     </div>
-    <div class="toast" id="toast" role="status"></div>
-    <script type="module" src="app.js"></script>
-  </body>
-</html>
+  </div>
+  <script>
+    (function() {
+      const PEGASUS_SYMBOL = '🦄';
+      let currentMode = 'classic';
+      let currentTimeControl = '10';
+      let isGameActive = false;
+      let gameFinished = false;
+      let moveHistory = [];
+      let whiteTime = 600, blackTime = 600;
+      let timerInterval = null;
+      let activeTimer = 'white';
+      let boardState = [];
+
+      const chessboardEl = document.getElementById('chessboard');
+      const moveHistoryEl = document.getElementById('moveHistory');
+      const timerWhiteEl = document.querySelector('#timerWhite span');
+      const timerBlackEl = document.querySelector('#timerBlack span');
+      const timerWhiteDiv = document.getElementById('timerWhite');
+      const timerBlackDiv = document.getElementById('timerBlack');
+      const onlineCountEl = document.getElementById('onlineCount');
+      const playerListEl = document.getElementById('playerList');
+      const analysisWaiting = document.getElementById('analysisWaiting');
+      const analysisMoves = document.getElementById('analysisMoves');
+      const nicknameInput = document.getElementById('nicknameInput');
+      const setNickBtn = document.getElementById('setNickBtn');
+
+      function initBoard() {
+        boardState = [
+          ['r','n','b','q','k','b','n','r'],
+          ['p','p','p','p','p','p','p','p'],
+          ['','','','','','','',''],
+          ['','','','','','','',''],
+          ['','','','','','','',''],
+          ['','','','','','','',''],
+          ['P','P','P','P','P','P','P','P'],
+          ['R','N','B','Q','K','B','N','R']
+        ];
+        renderBoard();
+      }
+
+      function renderBoard() {
+        chessboardEl.innerHTML = '';
+        for (let r = 0; r < 8; r++) {
+          for (let c = 0; c < 8; c++) {
+            const square = document.createElement('div');
+            const isLight = (r + c) % 2 === 0;
+            square.className = `square ${isLight ? 'light' : 'dark'}`;
+            square.dataset.row = r;
+            square.dataset.col = c;
+            const piece = boardState[r][c];
+            if (piece) {
+              const pieceSpan = document.createElement('span');
+              pieceSpan.className = 'piece';
+              const isWhite = piece === piece.toUpperCase();
+              const type = piece.toUpperCase();
+              if (currentMode === 'pegasus' && type === 'N') {
+                pieceSpan.classList.add('pegasus');
+                pieceSpan.textContent = PEGASUS_SYMBOL;
+              } else {
+                const symbolMap = {
+                  'K': isWhite ? '♔' : '♚', 'Q': isWhite ? '♕' : '♛',
+                  'R': isWhite ? '♖' : '♜', 'B': isWhite ? '♗' : '♝',
+                  'N': isWhite ? '♘' : '♞', 'P': isWhite ? '♙' : '♟'
+                };
+                pieceSpan.textContent = symbolMap[type] || '';
+                pieceSpan.classList.add(type === 'K' ? 'king' : type === 'Q' ? 'queen' : type === 'R' ? 'rook' : type === 'B' ? 'bishop' : type === 'N' ? 'knight' : 'pawn');
+                if (!isWhite) pieceSpan.style.opacity = '0.9';
+              }
+              square.appendChild(pieceSpan);
+            }
+            square.addEventListener('click', () => {
+              if (!isGameActive || gameFinished) return;
+              square.style.transform = 'scale(0.9)';
+              setTimeout(() => square.style.transform = '', 150);
+            });
+            chessboardEl.appendChild(square);
+          }
+        }
+      }
+
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentMode = btn.dataset.mode;
+          document.querySelectorAll('.mod-item').forEach(m => m.classList.toggle('active', m.dataset.mod === currentMode));
+          if (currentMode === 'pegasus') renderBoard();
+          else if (currentMode === 'chess960') { boardState[0] = ['r','n','b','q','k','b','n','r']; boardState[7] = ['R','N','B','Q','K','B','N','R']; renderBoard(); }
+          else initBoard();
+        });
+      });
+
+      document.querySelectorAll('.time-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentTimeControl = btn.dataset.time;
+          resetTimers(parseTimeControl(currentTimeControl));
+        });
+      });
+
+      function parseTimeControl(tc) {
+        if (tc.includes('+')) return parseInt(tc.split('+')[0]) * 60;
+        return parseInt(tc) * 60;
+      }
+
+      function resetTimers(seconds) {
+        whiteTime = seconds; blackTime = seconds;
+        updateTimerDisplay();
+        timerWhiteDiv.classList.remove('active');
+        timerBlackDiv.classList.remove('active');
+      }
+
+      function updateTimerDisplay() {
+        timerWhiteEl.textContent = formatTime(whiteTime);
+        timerBlackEl.textContent = formatTime(blackTime);
+      }
+
+      function formatTime(sec) {
+        const m = Math.floor(sec / 60), s = sec % 60;
+        return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+      }
+
+      function startGame() {
+        if (isGameActive) stopGame();
+        isGameActive = true; gameFinished = false; moveHistory = [];
+        updateMoveHistoryDisplay();
+        const baseSeconds = parseTimeControl(currentTimeControl);
+        whiteTime = baseSeconds; blackTime = baseSeconds;
+        updateTimerDisplay();
+        analysisWaiting.style.display = 'block';
+        analysisMoves.style.display = 'none';
+        activeTimer = 'white';
+        timerWhiteDiv.classList.add('active');
+        timerBlackDiv.classList.remove('active');
+        initBoard();
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          if (!isGameActive || gameFinished) return;
+          if (activeTimer === 'white') { whiteTime--; if (whiteTime <= 0) { whiteTime = 0; endGame('black'); } }
+          else { blackTime--; if (blackTime <= 0) { blackTime = 0; endGame('white'); } }
+          updateTimerDisplay();
+        }, 1000);
+        setTimeout(() => { if (isGameActive && !gameFinished) makeFakeMove(); }, 4000);
+      }
+
+      function makeFakeMove() {
+        if (!isGameActive || gameFinished) return;
+        const moves = ['e4','e5','Nf3','Nc6','Bb5','a6','Ba4','Nf6','O-O','Be7'];
+        const move = moves[Math.floor(Math.random() * moves.length)];
+        const color = activeTimer === 'white' ? 'white' : 'black';
+        moveHistory.push({ move, color });
+        updateMoveHistoryDisplay();
+        activeTimer = activeTimer === 'white' ?
+        
