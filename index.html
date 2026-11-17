@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10191c" />
+    <title>AERION — шахматы с размахом</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="skyline" aria-hidden="true">
+      <svg class="pegasus-outline p-one" viewBox="0 0 260 210" fill="none"><path d="M206 45c-31-21-58-19-86-1-23 15-42 40-40 74 1 30 30 54 62 48 23-4 43-28 45-49 17 4 36-1 46-16-15 2-28-1-38-10 24-1 44-16 54-36-16 6-30 5-43-10Z"/><path d="M116 97 54 26l36 91-69-22 62 53"/><path d="M96 162c-10 18-18 29-38 37m93-37c10 18 24 28 45 35"/></svg>
+      <svg class="pegasus-outline p-two" viewBox="0 0 260 210" fill="none"><path d="M206 45c-31-21-58-19-86-1-23 15-42 40-40 74 1 30 30 54 62 48 23-4 43-28 45-49 17 4 36-1 46-16-15 2-28-1-38-10 24-1 44-16 54-36-16 6-30 5-43-10Z"/><path d="M116 97 54 26l36 91-69-22 62 53"/><path d="M96 162c-10 18-18 29-38 37m93-37c10 18 24 28 45 35"/></svg>
+    </div>
+
+    <header class="topbar">
+      <button class="brand" data-screen="lobby" aria-label="На главную">
+        <span class="brand-mark">A</span><span>AERION</span>
+      </button>
+      <nav aria-label="Основная навигация">
+        <button class="nav-link active" data-screen="lobby">Лобби</button>
+        <button class="nav-link" data-screen="play">Играть</button>
+        <button class="nav-link" data-screen="analysis">Анализ</button>
+      </nav>
+      <div class="top-actions">
+        <button class="online-pill" data-screen="lobby"><i></i><span id="onlineCount">0</span> онлайн</button>
+        <button class="profile-button" id="profileButton"><span class="avatar" id="avatarInitial">A</span><span id="nickLabel">Арсен</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg></button>
+      </div>
+    </header>
+
+    <main>
+      <section id="lobbyScreen" class="screen active">
+        <section class="hero">
+          <p class="eyebrow">СОЗДАНО ДЛЯ ТЕХ, КТО ВИДИТ ДАЛЬШЕ</p>
+          <h1>Шахматы,<br /><em>которые взлетают.</em></h1>
+          <p class="hero-copy">В каждой позиции есть больше, чем один путь. Найди свой — и оставь след в небе.</p>
+          <div class="hero-actions">
+            <button class="button primary large" id="quickPlayButton"><span class="button-icon">↗</span> Найти соперника</button>
+            <button class="button ghost large" id="computerButton"><span class="button-icon">♙</span> Играть с компьютером</button>
+          </div>
+          <div class="hero-stats">
+            <span><b id="heroOnline">0</b> игроков в игре</span><span class="dot-divider"></span><span>Рейтинговые партии</span>
+          </div>
+        </section>
+
+        <section class="lobby-grid" aria-label="Игровое лобби">
+          <article class="panel queue-panel">
+            <div class="panel-heading"><div><p class="section-kicker">01 / ПОДБОР</p><h2>Начать партию</h2></div><span class="queue-mark">⌁</span></div>
+            <div class="segmented" role="tablist" aria-label="Тип партии">
+              <button class="segment active" data-game-mode="standard">Классика</button>
+              <button class="segment" data-game-mode="pegasus">Пегас</button>
+              <button class="segment" data-game-mode="chess960">960</button>
+            </div>
+            <p class="mode-description" id="modeDescription">Классические шахматы — чистая стратегия без лишнего шума.</p>
+            <div class="time-block"><div class="label-row"><span>КОНТРОЛЬ ВРЕМЕНИ</span><span id="timeDescription">Рапид</span></div><div id="timeControls" class="time-controls"></div></div>
+            <div class="queue-actions"><button class="button primary" id="startRated">Играть рейтинг</button><button class="icon-button" id="randomizeSide" title="Случайный цвет">⇄</button></div>
+          </article>
+
+          <article class="panel variation-panel">
+            <div class="panel-heading"><div><p class="section-kicker">02 / ВАРИАЦИИ</p><h2>Пегас</h2></div><span class="piece-value">6</span></div>
+            <div class="pegasus-card">
+              <div class="mini-pegasus">♞<span>⌁</span></div>
+              <div><p>Конь + слон</p><small>Пегас ходит как конь или по диагонали. Выберите этот режим в подборе.</small></div>
+            </div>
+            <div class="variant-rule"><span>♞</span><span class="rule-plus">+</span><span>♝</span><span class="rule-equals">=</span><span class="pegasus-symbol">♞</span></div>
+            <button class="text-button" id="selectPegasus">Выбрать режим Пегас <span>→</span></button>
+          </article>
+
+          <article class="panel people-panel">
+            <div class="panel-heading"><div><p class="section-kicker">03 / СЕЙЧАС В СЕТИ</p><h2>Игроки</h2></div><button class="text-button compact" id="refreshPeople">Обновить</button></div>
+            <div id="peopleList" class="people-list"><p class="empty-people">Подключаем живых игроков…</p></div>
+            <button class="button outline full" id="openChallenge">Бросить вызов</button>
+          </article>
+        </section>
+
+        <section class="how-it-works">
+          <p>Выберите формат <span>·</span> Установите время <span>·</span> Играйте <span>·</span> Разберите партию</p>
+        </section>
+      </section>
+
+      <section id="playScreen" class="screen play-screen">
+        <div class="game-layout">
+          <aside class="game-sidebar left-sidebar">
+            <button class="sidebar-back" data-screen="lobby">← Вернуться в лобби</button>
+            <div class="match-meta"><p class="section-kicker">РЕЙТИНГОВАЯ ПАРТИЯ</p><h2 id="matchTitle">Классика</h2><p id="matchSubline">Найдите соперника, чтобы начать</p></div>
+            <div class="side-rule"></div>
+            <p class="side-label">ПАРТИЯ</p>
+            <div class="game-details"><div><span>Формат</span><b id="detailMode">Классика</b></div><div><span>Время</span><b id="detailTime">10 мин</b></div><div><span>Ставка</span><b id="detailRating">Рейтинг</b></div></div>
+            <button class="resign-button" id="resignButton">Сдаться</button>
+          </aside>
+
+          <section class="board-stage">
+            <div class="move-ribbon" aria-label="Последние ходы"><div class="ribbon-title"><span class="pulse"></span><span id="gameStatus">Ожидание соперника</span></div><div class="move-track" id="moveTrack"><span class="move-empty">Первые ходы появятся здесь</span></div></div>
+            <div class="player-strip opponent" id="opponentStrip"><span class="avatar opponent-avatar" id="opponentInitial">?</span><div><b id="opponentName">Соперник</b><span id="opponentRating">Подбираем игрока</span></div><div class="clock" id="blackClock">10:00</div></div>
+            <div class="board-frame"><div class="coordinates files" aria-hidden="true"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div><div class="coordinates ranks" aria-hidden="true"><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span></div><div id="board" class="board" aria-label="Шахматная доска"></div></div>
+            <div class="player-strip self"><span class="avatar" id="playerInitial">A</span><div><b id="playerName">Арсен</b><span id="playerRating">Рейтинг 1200</span></div><div class="clock active" id="whiteClock">10:00</div></div>
+          </section>
+
+          <aside class="game-sidebar right-sidebar">
+            <div class="panel mini-panel"><p class="section-kicker">ХОДЫ ПАРТИИ</p><div class="notation-head"><span>№</span><span>Белые</span><span>Чёрные</span></div><div id="moveList" class="move-list"><p class="empty-moves">Доска ждёт первого хода.</p></div></div>
+            <div class="panel mini-panel insight-card"><p class="section-kicker">ПОЛЕ ЗРЕНИЯ</p><p id="turnInsight">Партия начнётся после выбора соперника.</p><div class="mini-bars"><i></i><i></i><i></i><i></i><i></i></div></div>
+            <button class="button ghost full" id="offerDraw">Предложить ничью</button>
+          </aside>
+        </div>
+      </section>
+
+      <section id="analysisScreen" class="screen analysis-screen">
+        <div class="analysis-hero"><p class="eyebrow">ПОСЛЕ ПАРТИИ</p><h1>Найди момент,<br /><em>когда всё изменилось.</em></h1><p>Разбор доступен только после завершения партии. Движок изучает позицию, а ты видишь идеи за ходами.</p></div>
+        <div class="analysis-grid">
+          <article class="panel analysis-status" id="analysisLocked"><span class="lock-icon">⌁</span><div><p class="section-kicker">STOCKFISH / АНАЛИЗ</p><h2>Закончите партию</h2><p>Чтобы защитить честную игру, подсказки и оценки открываются только после результата.</p></div></article>
+          <article class="panel analysis-results hidden" id="analysisResults"><div class="panel-heading"><div><p class="section-kicker">STOCKFISH / РАЗБОР</p><h2>Ключевые ходы</h2></div><span id="analysisDepth" class="engine-badge">ДВИЖОК</span></div><div id="analysisProgress" class="analysis-progress hidden"><span></span></div><div id="analysisList" class="analysis-list"></div></article>
+          <article class="panel report-card"><p class="section-kicker">ТВОЯ ИГРА</p><div class="report-score" id="accuracyScore">—<small>точность</small></div><div class="report-row"><span>Рейтинг</span><b id="ratingChange">1200</b></div><div class="report-row"><span>Лучший ход</span><b id="bestMoveDisplay">—</b></div></article>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal-layer" id="modalLayer" aria-hidden="true">
+      <section class="modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+        <button class="modal-close" data-close-modal>×</button><p class="section-kicker">ПРОФИЛЬ</p><h2 id="profileTitle">Как тебя зовут?</h2><p>Этот ник увидят соперники в лобби и во время партии.</p><label class="input-label" for="nickInput">НИКНЕЙМ</label><input id="nickInput" maxlength="18" placeholder="Например, AerionKnight" /><button class="button primary full" id="saveProfile">Сохранить</button>
+      </section>
+      <section class="modal hidden" id="challengeModal" role="dialog" aria-modal="true" aria-labelledby="challengeTitle">
+        <button class="modal-close" data-close-modal>×</button><p class="section-kicker">ПРЯМОЙ ВЫЗОВ</p><h2 id="challengeTitle">Выберите игрока</h2><p id="challengeCopy">Игроки появятся здесь, когда подключатся к вашему серверу.</p><div id="challengeList" class="challenge-list"></div><button class="button ghost full" data-close-modal>Отмена</button>
+      </section>
+    </div>
+    <div class="toast" id="toast" role="status"></div>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
